@@ -1,0 +1,12 @@
+user:   elastic
+pass:   elastic
+
+
+Cmd reset password for elastic user:
+    elasticsearch-reset-password -u elastic -i --url https://localhost:9200
+    or
+    ./bin/elasticsearch-setup-passwords interactive
+
+Ở lần đầu chạy kibana kibana sẽ cần token của ES để config, trong folder ES: 
+    .\bin\elasticsearch-create-enrollment-token.bat --scope kibana
+sẽ tạo ra 1 token

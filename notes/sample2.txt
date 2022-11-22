@@ -1,0 +1,125 @@
+GET tutorial1/_search
+{
+  "size": 0, 
+  "aggs": {
+    "sum_age": {
+      "sum": {
+        "field": "age"
+      }
+    }
+  }
+}
+
+GET tutorial1/_search
+{
+  "size": 0, 
+  "aggs": {
+    "highest_age": {
+      "max": {                  # tương tự với min, avg
+        "field": "age"
+      }
+    }
+  }
+}
+
+# tính count, min, max, avg, sum cùng 1 lúc
+GET tutorial1/_search
+{
+  "size": 0, 
+  "aggs": {
+    "sum_age": {
+      "stats": {
+        "field": "age"
+      }
+    }
+  }
+}
+
+# đếm số unique value của 1 field
+GET ecomerce_data/_search
+{
+    "size": 0,
+    "aggs": {
+        "number_of_unique_customers": {
+            "cardinality": {
+                "field": "CustomerID"
+            }
+        }
+    }
+}
+
+# Kết hợp query và aggs
+# query ra các doc có "country" là "Germany" ==> tính sum của các doc đó trên field "age"
+GET tutorial1/_search
+{
+  "from": 2,    # từ index 2 trả về 4 kết quả satisfied query
+  "size": 4, 
+  "query": {
+    "match": {
+      "country": "Germany"
+    }
+  }, 
+  "aggs": {
+    "sum_age": {
+      "sum": {
+        "field": "age"
+      }
+    }
+  }
+}
+
+#tổng hợp docs theo "UnitPrice"
+GET tutorial1/_search
+{
+  "size": 0, 
+  "aggs": {
+    "transaction_per_custom_price_ranges": {
+      "range": {
+        "field": "UnitPrice",
+        "ranges": [
+          {
+            "to": 50
+          },
+          {
+            "from": 50,
+            "to": 200
+          },
+          {
+            "from": 200
+          }
+        ]
+      } 
+    }
+  }
+}
+
+# get ra top 5 CustomerID xuất hiện nhiều nhất
+GET tutorial1/_search
+{
+  "size": 0,
+  "aggs": {
+    "top_5_clients": {
+      "terms": {
+        "field": "CustomerID",
+        "size": 5
+      }
+    }
+  }
+}
+===> xuất ra 5 buckets chứa (CustomerID, doc_count)
+
+GET tutorial1/_search
+{
+  "size": 0,
+  "aggs": {
+    "top_5_clients_with_lowest_number_of_transaction": {
+      "terms": {
+        "field": "CustomerID",
+        "size": 5,
+        "order": {
+          "_count": "asc"
+        }
+      }
+    }
+  }
+}

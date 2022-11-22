@@ -1,0 +1,106 @@
+PUT defined_mapping_index
+{
+  "mappings": {
+    "properties": {
+      "botanical_name": {
+        "enabled": false
+      },
+      "country_of_origin": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword"
+          }
+        }
+      },
+      "date_purchased": {
+        "type": "date"
+      },
+      "description": {
+        "type": "text"
+      },
+      "name": {
+        "type": "text"
+      },
+      "produce_type": {
+        "type": "keyword"
+      },
+      "quantity": {
+        "type": "long"
+      },
+      "unit_price": {
+        "type": "float"
+      },
+      "vendor_details": {
+        "enabled": false
+      }
+    }
+  }
+}
+
+GET defined_mapping_index/_mapping
+
+Nếu write 1 document chứa field chưa đc define mapping vào index trên
+ES sẽ dynamic mapping cho field đó (có thể define mapping cho field đó bằng request như trên)
+
+POST _reindex
+{
+  "source": {
+    "index": "old_index"
+  },
+  "dest": {
+    "index": "new_index"
+  }
+}
+
+-------------------------------------
+Bài toán: index chứa document lquan đến sp
+{
+  "product_name",
+  "unit_price",
+  "quantity"
+}
+tính tổng tiền mỗi món đã bán đc - tổng tiền tất cá món đã bán
+
+body = {
+  "runtime": {
+      "total": {
+          "type": "double",
+          "script": {
+              "source": "emit( doc['price'].value * doc['quantity'].value )",
+              "lang": 'painless'
+          }
+      }
+  }
+}
+es.indices.put_mapping(index='products_sale', body= body)
+
+Do mỗi món hàng chưa có field 'total' ===> Thêm 1 field runtime vào mapping của index
+Khi nào mà người dùng request tới field 'total' ===> ES sẽ tạo ra field 'total' với gtri đc tính toán như trên
+
+body = {
+  "size": 0,
+  "aggs": {
+      "total_sale": {
+          "sum": {
+              "field": "total"
+          }
+      }
+  }
+}
+res = es.search(index="products_sale", body=body)
+print(res)
+
+multi query search es
+multi query in one
+
+
+index
+date
+title
+prior
+status
+primary
+
+wildcard query
+regexp query

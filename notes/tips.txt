@@ -1,0 +1,66 @@
+default mapping của string là type: text + keyword
+
+text type : tạo ra inverted index ==> full text search (nhưng kh thể sort)
+keyword type : tạo ra doc values ===> sort, filter ( nhưng kh thể full text search, chỉ có thể exact search ) 
+
+query = {
+    "query": {
+        "match": { 
+            "city" : 'TPHCM DA'
+        },
+    },
+    "sort": [
+        {"user_id.keyword": "desc"}
+    ]
+}
+
+----------------------------------------------------------------
+
+TRONG BOOL QUERYl
++ filter
+    giống must (nhưng nếu match sẽ không tăng _score)
+
++ should 
+    nếu bool query chỉ có should clause (không must, must not clause nào)
+    ===> minimum_should_match default sẽ là 1
+    và ngược lại minimum_should_match default sẽ là 0 (nếu match sẽ tăng _score doc đó lên) 
+
+TRONG 1 clause của bool query 
+Case: nếu user truyền kw gì thì search dựa vào keyword đó
+Hướng giải quyết: nếu biến nào không đc truyền thì sẽ truyền vào mảng của clause đó 'None'
+Vấn đề: chỉ có thể có 1 None
+    query = {
+        "query": {
+            "bool": {
+                "must": [
+                    {
+                        "wildcard": {
+                            "title.keyword": {
+                                "value": title_to_search
+                            }
+                        }
+                    } if title_to_search else None,
+                    None,                               (*)
+                    {
+                        "range": {
+                            "status": {
+                                "gte": status_start,
+                                "lt": stautus_end
+                                # "value": status_to_search
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    }
+(*) Nếu câu query đầu trong must là None ==> 2 None ==> Lỗi
+    Nếu câu query đầu trong must là wildcard ==> 1 None ==> Search bth
+Hướng giải quyết:
+    (1) tạo 1 hàm để generate ra mảng cho 'must' với cách check như trên
+    (2) sau đó bỏ các phần tử None
+    (3) gán vô must trong câu query
+
+----------------------------------------------------------------
+
+Avoid using the term query for text fields.

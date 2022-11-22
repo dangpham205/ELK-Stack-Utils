@@ -1,0 +1,165 @@
+# Click the Variables button, above, to create your own variables.
+GET ${exampleVariable1} // _search
+{
+  "query": {
+    "${exampleVariable2}": {} // match_all
+  }
+}
+GET _cat/indices/tutorial1
+GET _cat/aliases
+GET tutorial1
+PUT _cat/indices/tutorial1/song/1
+{
+  "title": "abc",
+  "year": 2021
+}
+GET _cluster/health
+GET _nodes/stats
+
+PUT favorite_candy
+
+POST favorite_candy/_doc
+{
+  "name": "Chupachup",
+  "price": 23
+}
+
+PUT favorite_candy/_doc/1
+{
+  "name": "anpelibe",
+  "price": 12
+}
+
+POST favorite_candy/_update/1
+{
+  "doc": {
+    "TEST" : 99
+  }
+}
+
+GET favorite_candy/_doc/1
+
+GET favorite_candy/_search
+
+GET favorite_candy/_search
+{
+  "track_total_hits": true
+}
+
+GET favorite_candy/_search
+{
+  "query": {
+    "range": {
+      "price": {
+        "gte": 5,
+        "lte": 30
+      }
+    }
+  }
+}
+
+GET favorite_candy/_search
+{
+  "query": {
+    "match": {
+      "name": "Chupachup"
+    }
+  },
+  "aggs": {
+    "NAME": {
+      "AGG_TYPE": {}
+    }
+  }
+}
+
+GET tutorial1/_search
+
+# lấy ra các kqua search có từ "Obama" trong các fields: headline, description,...
+# nếu như từ khóa nằm trong field "headline", score của doc đó sẽ ^2, nâng rank nó lên trong results  
+GET tutorial1/_search
+{
+  "query": {
+    "multi_match": {
+      "query": "Obama",
+      "fields": [
+        "headline^2",
+        "description",
+        "authors",
+        "country"
+        ],
+        "type": "phrase"            # chế độ match_phrase
+        "type": "best_fields"    lấy document có score best_field cao nhất (field chứa nhiều keyword satisfied query nhất)
+    }
+  }
+}
+
+# trong hits trả về các doc có chứa Michelle Obama ở headline
+# trong aggregations trả về thống kê các category của các doc này 
+GET tutorial1/_search
+{
+  "query": {
+    "match_phrase": {
+      "headline": "Michelle Obama"
+    }
+  },
+  "aggs": {
+    "Category_mentioned": {
+      "terms": {
+        "field": "category",
+        "size": 100
+      }
+    }
+  }
+}
+
+# Combined query
+GET tutorial1/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match_phrase": {
+            "country": "united states "     # buộc phải chứa united states trong country
+          }
+        }
+      ],
+      "must_not": [
+        {
+          "match": {
+            "category": "Wedding"       # category không được chứa từ Wedding
+          }
+        }
+      ],
+      "should": [
+        {
+          "match_phrase": {
+            "category": "Politics"      # nếu category có chứa Politics, score sẽ cao hơn
+          }
+        }
+      ],
+      "filter": [
+        {
+          "range": {                # age phải từ 10< x <=200
+            "age": {
+              "gt": 10,
+              "lte": 200
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+

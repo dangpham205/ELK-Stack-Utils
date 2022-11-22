@@ -3,6 +3,8 @@ import logging
 from datetime import datetime
 import logstash
 
+# host - port là của log stash instance đang đc chạy
+
 class Logging(object):
     def __init__(self, logger_name='hd-logger',
                  log_stash_host='localhost',
@@ -31,7 +33,7 @@ class Logging(object):
     
     
 
-instance = Logging(log_stash_upd_port=5959, log_stash_host='localhost', logger_name='haidang')
+instance = Logging(log_stash_upd_port=5959, log_stash_host='localhost', logger_name='read_doc_logger')
 logger = instance.get()
 
 count = 0

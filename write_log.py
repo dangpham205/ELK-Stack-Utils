@@ -6,7 +6,7 @@ import logstash
 # host - port là của log stash instance đang đc chạy
 
 class Logging(object):
-    def __init__(self, logger_name='hd-logger',
+    def __init__(self, logger_name='hd_logger--read_documents',
                  log_stash_host='localhost',
                  log_stash_upd_port=5959
     ):
@@ -15,6 +15,7 @@ class Logging(object):
         self.log_stash_upd_port = log_stash_upd_port
         
     def get(self):
+        # ghi vào file log dưới local (chưa có sẽ tạo)
         logging.basicConfig(
             filename="logfile",
             filemode="a",
@@ -32,18 +33,18 @@ class Logging(object):
         return self.logger
     
     
+if __name__ == "__main__":
+    instance = Logging()
+    logger = instance.get()
 
-instance = Logging(log_stash_upd_port=5959, log_stash_host='localhost', logger_name='read_doc_logger')
-logger = instance.get()
+    count = 0
+    from time import sleep
 
-count = 0
-from time import sleep
-while True:
 
-    count = count + 1
-
-    if count % 2 == 0:
-        logger.error('Error Message Code Faield :{} '.format(count))
-    else:
-        logger.info('python-logstash: test logstash info message:{} '.format(count))
-    sleep(3)
+    logger.error({
+        "doc_id": 1,
+        "user_id": 269,
+        "status": "Đã đọc",
+        "timestamp": datetime.now()
+    })
+    # sleep(3)

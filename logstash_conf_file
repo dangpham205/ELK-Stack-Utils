@@ -11,11 +11,11 @@ output {
     codec => rubydebug
   }
   elasticsearch {
-	hosts => ["https://localhost:9200"]
-	index => "hd_logger_db" 
-        user => "elastic"
-        password => "elastic"
-        ssl_certificate_verification => false
+	  hosts => ["https://localhost:9200"]
+	  index => "hd_logger_db" 
+    user => "elastic"
+    password => "elastic"
+    ssl_certificate_verification => false
   }
 
   
